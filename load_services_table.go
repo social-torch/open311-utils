@@ -1,4 +1,4 @@
-/* Script to populate an AWS dynamoDB database with Open311 Services */
+/* Script to populate an AWS dynamoDB database from JSCON file of Open311 Services */
 
 package main
 
@@ -18,6 +18,7 @@ import (
 
 func main() {
 
+	//Set up command line flags and defaults for Services File, AWS Region, and DynamoDB table name
 	servicesFilePtr := flag.String("serviceFile", "./SchenectadyServices.json", "JSON file containing list of Open311 Services offered by city")
 	regionPtr := flag.String("region", "us-east-1", "AWS region in which DynamoDB table should be created")
 	tableNamePtr := flag.String("tableName", "Services", "Name of table in DynamoDB that will hold Services data")
