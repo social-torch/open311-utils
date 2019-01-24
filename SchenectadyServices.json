@@ -1,0 +1,155 @@
+[
+	{
+		"service_code": "a7979d12-dbda-47bc-81ee-678389435a14",
+		"service_name": "Pothole",
+		"description": "Report a pothole in the street that needs to be repaired.",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["pothole", "street", "paving"],
+		"group": "Bureau Of Services"
+	},
+	{
+		"service_code": "001d129a-cb42-43b4-9634-001e963690c6",
+		"service_name": "Snow plowing",
+		"description": "Request for snow removal",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["snow", "plow", "removal", "street"],
+		"group": "Bureau Of Services"
+	},
+	{
+		"service_code": "bd493418-3871-43cf-b574-04c9c2c37dab",
+		"service_name": "Broken sidewalk",
+		"description": "Sidewalk, curb or ramp has problems such as cracking, missing pieces, holes, and/or chipped curb.",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["sidewalk", "curb"],
+		"group": "Engineering"
+	},
+	{
+		"service_code": "6f188b23-bf1e-4850-81f5-152141a51343",
+		"service_name": "Housing/Code complaint",
+		"description": "Report an issue related to housing, code compliance or other safety issue",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["code", "housing"],
+		"group": "Codes"
+	},
+	{
+		"service_code": "44e55e07-f414-41c6-ba05-61db6bc994a0",
+		"service_name": "Working without a permit",
+		"description": "Report construction without a proper permit",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["permit"],
+		"group": "Codes"
+	},
+	{
+		"service_code": "59910f70-8321-4d27-87d9-bd10e6808b01",
+		"service_name": "Commercial Business out of their residential property",
+		"description": "Report operation of a business from residential property",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["home business"],
+		"group": "Development"
+	},
+	{
+		"service_code": "5fc83d3a-cf44-4074-811d-dfcc2c56d121",
+		"service_name": "Operating a body shop in the street",
+		"description": "Report auto body repair business operating on a public street",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["body shop", "auto"],
+		"group": "Development"
+	},
+	{
+		"service_code": "5f1b3b7d-e06a-4564-b560-1b1b75bbf025",
+		"service_name": "Assessment Question",
+		"description": "",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": [""],
+		"group": "Parks/Snap"
+	},
+	{
+		"service_code": "042a98f7-428e-4849-a2eb-e15ba76e64de",
+		"service_name": "Nuisance inspector request",
+		"description": "Report a public nuisance to be inspected",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": [""],
+		"group": "Parks/Snap"
+	},
+	{
+		"service_code": "e69e1dcf-f4a3-4492-91ea-aa0574d29e8d",
+		"service_name": "Parks Request",
+		"description": "Report an issue in one of Schenectady's public parks",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["parks"],
+		"group": "Parks/Snap"
+	},
+	{
+		"service_code": "aadda254-98e6-425a-a311-cf51a21a4a85",
+		"service_name": "Tree Complaint",
+		"description": "Report an issue related to tree",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["tree"],
+		"group": "Parks/Snap"
+	},
+	{
+		"service_code": "3de854c5-28fa-4306-9ff4-543832ddac37",
+		"service_name": "Parking Ticket Question",
+		"description": "Request information about a parking ticket",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["parking", "ticket"],
+		"group": "Police/Fire"
+	},
+	{
+		"service_code": "658b3a95-3dd1-4f29-986c-6773a357f8ef",
+		"service_name": "Speeding in neighborhood",
+		"description": "Report unsafe driving in a residential area",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["speeding", "Driving fast"],
+		"group": "Police/Fire"
+	},
+	{
+		"service_code": "f11a487d-cf6c-42ee-8479-0e4493825217",
+		"service_name": "Street Lights Out",
+		"description": "Report a street light that isn't working",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["street light"],
+		"group": "Utilities"
+	},
+	{
+		"service_code": "97ee8b31-f173-4c1d-8431-5eef0da1c83f",
+		"service_name": "Garbage Pickup Complaint",
+		"description": "Report an issue with garbage or trash",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["garbage", "trash"],
+		"group": "Waste Department"
+	},
+	{
+		"service_code": "8da27de6-ef16-439f-8e9e-0651eef82932",
+		"service_name": "Sewer Issue",
+		"description": "Report an issue with the sewer",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["sewer", "drain"],
+		"group": "Water Department"
+	},
+	{
+		"service_code": "48a9df74-f07b-47b8-8a53-d46637cbc1ea",
+		"service_name": "Water Leak",
+		"description": "Report a water leak",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["leak", "water", "main"],
+		"group": "Water Department"
+	}
+]
