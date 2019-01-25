@@ -1,4 +1,5 @@
 
 load_services_table
+load_requests_table
 open311-util
 
