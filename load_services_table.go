@@ -1,4 +1,4 @@
-/* Script to populate an AWS dynamoDB database from JSCON file of Open311 Services */
+/* Script to populate an AWS dynamoDB database from JSON file of Open311 Services */
 
 package main
 
@@ -41,6 +41,8 @@ func main() {
 	// Create DynamoDB table to hold services
 	svc := dynamodb.New(sess)
 	createServicesTable(svc, *tableNamePtr)
+
+	// TODO block until table is finished being created.
 
 	// Populate DynamoDB Services Table with Items from JSON file
 	populateServicesTable(svc, *tableNamePtr, services)
