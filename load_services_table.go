@@ -14,12 +14,13 @@ import (
 	"github.com/social-torch/open311-util/types"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 func main() {
 
 	//Set up command line flags and defaults for Services File, AWS Region, and DynamoDB table name
-	servicesFilePtr := flag.String("serviceFile", "./SchenectadyServices.json", "JSON file containing list of Open311 Services offered by city")
+	servicesFilePtr := flag.String("serviceFile", "./data/SchenectadyServices.json", "JSON file containing list of Open311 Services offered by city")
 	regionPtr := flag.String("region", "us-east-1", "AWS region in which DynamoDB table should be created")
 	tableNamePtr := flag.String("tableName", "Services", "Name of table in DynamoDB that will hold Services data")
 
@@ -41,8 +42,6 @@ func main() {
 	// Create DynamoDB table to hold services
 	svc := dynamodb.New(sess)
 	createServicesTable(svc, *tableNamePtr)
-
-	// TODO block until table is finished being created.
 
 	// Populate DynamoDB Services Table with Items from JSON file
 	populateServicesTable(svc, *tableNamePtr, services)
@@ -110,6 +109,17 @@ func createServicesTable(svc *dynamodb.DynamoDB, tableName string) (*dynamodb.Cr
 		return result, err
 	}
 
+	// Block until table creation is complete
+	descInput := &dynamodb.DescribeTableInput{
+		TableName: aws.String(tableName),
+	}
+	description, _ := svc.DescribeTable(descInput)
+	for *description.Table.TableStatus != "ACTIVE" {
+		fmt.Println("Table Creation Pending. Waiting on AWS. . . ")
+		time.Sleep(5000 * time.Millisecond)
+		description, _ = svc.DescribeTable(descInput)
+
+	}
 	fmt.Println("Created the table " + tableName + " in " + *svc.Client.Config.Region)
 	return result, err
 }

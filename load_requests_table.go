@@ -14,12 +14,13 @@ import (
 	"github.com/social-torch/open311-util/types"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 func main() {
 
 	//Set up command line flags and defaults for Requests File, AWS Region, and DynamoDB table name
-	requestsFilePtr := flag.String("requestFile", "./SchenectadyRequests.json", "JSON file containing list of example requests")
+	requestsFilePtr := flag.String("requestFile", "./data/SchenectadyRequests.json", "JSON file containing list of example requests")
 	regionPtr := flag.String("region", "us-east-1", "AWS region in which DynamoDB table should be created")
 	tableNamePtr := flag.String("tableName", "Requests", "Name of table in DynamoDB that will hold Requests data")
 
@@ -41,8 +42,6 @@ func main() {
 	// Create DynamoDB table to hold services
 	svc := dynamodb.New(sess)
 	createRequestsTable(svc, *tableNamePtr)
-
-	// TODO block until table is finished being created.
 
 	// Populate DynamoDB Table with Items from JSON file
 	populateRequestsTable(svc, *tableNamePtr, requests)
@@ -108,6 +107,18 @@ func createRequestsTable(svc *dynamodb.DynamoDB, tableName string) (*dynamodb.Cr
 			fmt.Println(err.Error())
 		}
 		return result, err
+	}
+
+	// Block until table creation is complete
+	descInput := &dynamodb.DescribeTableInput{
+		TableName: aws.String(tableName),
+	}
+	description, _ := svc.DescribeTable(descInput)
+	for *description.Table.TableStatus != "ACTIVE" {
+		fmt.Println("Table Creation Pending. Waiting on AWS. . . ")
+		time.Sleep(5000 * time.Millisecond)
+		description, _ = svc.DescribeTable(descInput)
+
 	}
 
 	fmt.Println("Created the table " + tableName + " in " + *svc.Client.Config.Region)
