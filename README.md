@@ -1,4 +1,6 @@
 # Open311 Utilities
+These golang utilities will load AWS DynamoDB tables with Open311 Services and Requests
+for prepopulating city services in a new Open311 deployment or for testing with a set of request.
 
 ```bash
 $ > mkdir -p $GOPATH/src/github.com/social-torch
