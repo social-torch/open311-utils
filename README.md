@@ -29,14 +29,14 @@ $ > ./load_requests_table
 
 Usage of ./load_services_table:
 |Command line flag | Description | Default|
--------------------|-------------|--------|
+-------------------|-------------|--------
 |-region|  AWS region in which DynamoDB table should be created| "us-east-1" |
 |-serviceFile |JSON file containing list of Open311 Services offered by city | ""./data/SchenectadyServices.json" |
 |-tableName | Name of table in DynamoDB that will hold Services data | "Services"|
 
 Usage of ./load_requests_table:
 |Command line flag | Description | Default|
--------------------|-------------|--------|
+-------------------|-------------|--------
 |-region|  AWS region in which DynamoDB table should be created| "us-east-1" |
 |-requestFile | JSON file containing list of example requests | "./data/SchenectadyRequests.json" |
 |-tableName | Name of table in DynamoDB that will hold Requests data | "Requests" |
