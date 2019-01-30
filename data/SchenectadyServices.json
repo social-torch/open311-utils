@@ -108,7 +108,7 @@
 		"group": "Police/Fire"
 	},
 	{
-		"service_code": "SC0-658b3a95-3dd1-4f29-986c-6773a357f8ef",
+		"service_code": "SC-658b3a95-3dd1-4f29-986c-6773a357f8ef",
 		"service_name": "Speeding in neighborhood",
 		"description": "Report unsafe driving in a residential area",
 		"metadata": true,
