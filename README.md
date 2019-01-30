@@ -26,17 +26,19 @@ $ > go build load_requests_table.go
 $ > ./load_services_table
 $ > ./load_requests_table
 ```
-```
+
 Usage of ./load_services_table:
-  -region string
+```
+-region string
         AWS region in which DynamoDB table should be created (default "us-east-1")
   -serviceFile string
         JSON file containing list of Open311 Services offered by city (default "./data/SchenectadyServices.json")
   -tableName string
         Name of table in DynamoDB that will hold Services data (default "Services")
 ```
-```
+
 Usage of ./load_requests_table:
+```
   -region string
         AWS region in which DynamoDB table should be created (default "us-east-1")
   -requestFile string
