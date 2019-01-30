@@ -26,22 +26,24 @@ $ > go build load_requests_table.go
 $ > ./load_services_table
 $ > ./load_requests_table
 ```
-
+```
 Usage of ./load_services_table:
-|Command line flag | Description | Default|
-|-------------------|-------------|--------|
-|-region|  AWS region in which DynamoDB table should be created| "us-east-1" |
-|-serviceFile |JSON file containing list of Open311 Services offered by city | ""./data/SchenectadyServices.json" |
-|-tableName | Name of table in DynamoDB that will hold Services data | "Services"|
-
+  -region string
+        AWS region in which DynamoDB table should be created (default "us-east-1")
+  -serviceFile string
+        JSON file containing list of Open311 Services offered by city (default "./data/SchenectadyServices.json")
+  -tableName string
+        Name of table in DynamoDB that will hold Services data (default "Services")
+```
+```
 Usage of ./load_requests_table:
-|Command line flag | Description | Default|
-|-------------------|-------------|--------|
-|-region|  AWS region in which DynamoDB table should be created| "us-east-1" |
-|-requestFile | JSON file containing list of example requests | "./data/SchenectadyRequests.json" |
-|-tableName | Name of table in DynamoDB that will hold Requests data | "Requests" |
-
-
+  -region string
+        AWS region in which DynamoDB table should be created (default "us-east-1")
+  -requestFile string
+        JSON file containing list of example requests (default "./data/SchenectadyRequests.json")
+  -tableName string
+        Name of table in DynamoDB that will hold Requests data (default "Requests")
+```
 
 ### Specify command line options
 
