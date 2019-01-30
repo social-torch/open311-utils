@@ -29,7 +29,7 @@ $ > ./load_requests_table
 
 Usage of ./load_services_table:
 ```
--region string
+  -region string
         AWS region in which DynamoDB table should be created (default "us-east-1")
   -serviceFile string
         JSON file containing list of Open311 Services offered by city (default "./data/SchenectadyServices.json")
