@@ -11,11 +11,23 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-	"github.com/social-torch/open311-util/types"
 	"io/ioutil"
 	"os"
 	"time"
 )
+
+// A Service is offered by a city and defines what requests a citizen can make
+// Single service (type) offered via Open311
+// see https://wiki.open311.org/GeoReport_v2/#get-service-list
+type Service struct {
+	ServiceCode string   `json:"service_code"`
+	ServiceName string   `json:"service_name"`
+	Description string   `json:"description"`
+	Metadata    bool     `json:"metadata"`
+	Type        string   `json:"type"`
+	Keywords    []string `json:"keywords"` // Note: Keywrods is an array
+	Group       string   `json:"group"`
+}
 
 func main() {
 
@@ -48,7 +60,7 @@ func main() {
 
 }
 
-func getServicesFromFile(filename string) []open311.Service {
+func getServicesFromFile(filename string) []Service {
 	raw, filErr := ioutil.ReadFile(filename)
 
 	if filErr != nil {
@@ -56,7 +68,7 @@ func getServicesFromFile(filename string) []open311.Service {
 		os.Exit(1)
 	}
 
-	var services []open311.Service
+	var services []Service
 	marshalErr := json.Unmarshal(raw, &services)
 	if marshalErr != nil {
 		fmt.Println("Error Unmarshaling JSON.  Check Syntax in " + filename)
@@ -124,7 +136,7 @@ func createServicesTable(svc *dynamodb.DynamoDB, tableName string) (*dynamodb.Cr
 	return result, err
 }
 
-func populateServicesTable(svc *dynamodb.DynamoDB, tableName string, services []open311.Service) {
+func populateServicesTable(svc *dynamodb.DynamoDB, tableName string, services []Service) {
 
 	for _, service := range services {
 		av, err := dynamodbattribute.MarshalMap(service)
