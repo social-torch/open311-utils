@@ -1,4 +1,18 @@
-/* Script to populate an AWS dynamoDB database from JSON file of Open311 Services */
+/* Script to populate an AWS dynamoDB database from JSON file of Open311 Services
+If table already exists, script will add items to existing table.
+If table doesn't exist, script will create table and add items
+
+Uses credentials found in shared credentials file ~/.aws/credentials  //TODO change this to .env in makefile
+and assumes these credentials have permission to create and put items in DynamoDB
+
+Optional flags for ./load_services_table include:
+ -region string
+        AWS region in which DynamoDB table should be created (default "us-east-1")
+  -serviceFile string
+        JSON file containing list of Open311 Services offered by city (default "./data/SchenectadyServices.json")
+  -tableName string
+        Name of table in DynamoDB that will hold Services data (default "Services")
+*/
 
 package main
 
@@ -11,11 +25,24 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-	"github.com/social-torch/open311-util/types"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"time"
 )
+
+// A Service is offered by a city and defines what requests a citizen can make
+// Single service (type) offered via Open311
+// see https://wiki.open311.org/GeoReport_v2/#get-service-list
+type Service struct {
+	ServiceCode string   `json:"service_code"`
+	ServiceName string   `json:"service_name"`
+	Description string   `json:"description"`
+	Metadata    bool     `json:"metadata"`
+	Type        string   `json:"type"`
+	Keywords    []string `json:"keywords"` // Note: Keywords is an array
+	Group       string   `json:"group"`
+}
 
 func main() {
 
@@ -27,45 +54,65 @@ func main() {
 	flag.Parse()
 
 	// Read JSON file of Services Available
-	services := getServicesFromFile(*servicesFilePtr)
+	services, err := readServicesJson(*servicesFilePtr)
+	if err != nil {
+		fmt.Println("Error reading services json file.")
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	fmt.Println("Read " + strconv.Itoa(len(services)) + " Services from JSON")
 
 	// Initialize an AWS  session in specified region that SDK will use to load
-	// credentials from the shared credentials file ~/.aws/credentials.
+	// credentials from the shared credentials file ~/.aws/credentials.  //TODO change this to use .env file
 	sess, err := session.NewSession(&aws.Config{Region: aws.String(*regionPtr)})
-
 	if err != nil {
 		fmt.Println("Error creating AWS session:")
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	// Create DynamoDB table to hold services
 	svc := dynamodb.New(sess)
-	createServicesTable(svc, *tableNamePtr)
+
+	// Create DynamoDB table to hold services.  Function doesn't return until table is ready for items to be written
+	_, err = createServicesTable(svc, *tableNamePtr)
+	if err != nil {
+		fmt.Println("Error creating '" + *tableNamePtr + "' table.")
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 
 	// Populate DynamoDB Services Table with Items from JSON file
-	populateServicesTable(svc, *tableNamePtr, services)
-
-}
-
-func getServicesFromFile(filename string) []open311.Service {
-	raw, filErr := ioutil.ReadFile(filename)
-
-	if filErr != nil {
-		fmt.Println(filErr.Error())
+	itemsAdded, err := populateServicesTable(svc, *tableNamePtr, services)
+	if err != nil {
+		fmt.Println("Error populating '" + *tableNamePtr + "' table.")
+		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	var services []open311.Service
-	marshalErr := json.Unmarshal(raw, &services)
-	if marshalErr != nil {
+	fmt.Println("This script added " + strconv.Itoa(itemsAdded) + " items to the '" + *tableNamePtr + "' table.")
+
+}
+
+// Utility function to read JSON file and unmarshal into array of Services
+func readServicesJson(filename string) ([]Service, error) {
+	raw, err := ioutil.ReadFile(filename)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil, err
+	}
+
+	var services []Service
+	err = json.Unmarshal(raw, &services)
+	if err != nil {
 		fmt.Println("Error Unmarshaling JSON.  Check Syntax in " + filename)
-		fmt.Println(marshalErr.Error())
-		os.Exit(1)
+		fmt.Println(err.Error())
+		return services, err
 	}
-	return services
+	return services, err
 }
 
+// Function to create AWS DynamoDB table of given name.  Function does not return until table is ACTIVE
 func createServicesTable(svc *dynamodb.DynamoDB, tableName string) (*dynamodb.CreateTableOutput, error) {
 
 	input := &dynamodb.CreateTableInput{
@@ -82,49 +129,49 @@ func createServicesTable(svc *dynamodb.DynamoDB, tableName string) (*dynamodb.Cr
 			},
 		},
 		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(5),
+			ReadCapacityUnits:  aws.Int64(5), //TODO Determine right default provisioned capacity
 			WriteCapacityUnits: aws.Int64(5),
 		},
 		TableName: aws.String(tableName),
 	}
 
 	result, err := svc.CreateTable(input)
+
+	// If table already exists, return gracefully
+	// see: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/handling-errors.html
 	if err != nil {
-		if aerr, ok := err.(awserr.Error); ok {
-			switch aerr.Code() {
-			case dynamodb.ErrCodeResourceInUseException:
-				fmt.Println(dynamodb.ErrCodeResourceInUseException, aerr.Error())
-			case dynamodb.ErrCodeLimitExceededException:
-				fmt.Println(dynamodb.ErrCodeLimitExceededException, aerr.Error())
-			case dynamodb.ErrCodeInternalServerError:
-				fmt.Println(dynamodb.ErrCodeInternalServerError, aerr.Error())
-			default:
-				fmt.Println(aerr.Error())
+		if awsErr, ok := err.(awserr.Error); ok {
+			switch awsErr.Code() {
+			case dynamodb.ErrCodeResourceInUseException: // AWS returns ResouceInUseException to a createTable call if table already exists
+				fmt.Println("Warning: '" + tableName + "' table already exists.  Continuing to add items to existing table.")
+				return result, nil // If table already exists, return without error to continue
+			default: // Process error generically
+				return result, err
 			}
-		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
-			fmt.Println(err.Error())
 		}
-		return result, err
 	}
 
-	// Block until table creation is complete
+	// Get current table description to see if table is ready to write items
 	descInput := &dynamodb.DescribeTableInput{
 		TableName: aws.String(tableName),
 	}
 	description, _ := svc.DescribeTable(descInput)
+
+	// Block until table creation is complete
+	fmt.Println("Creating table '" + tableName + "' in DynamoDB. . .")
 	for *description.Table.TableStatus != "ACTIVE" {
-		fmt.Println("Table Creation Pending. Waiting on AWS. . . ")
+		fmt.Println("Waiting on AWS. . . ")
 		time.Sleep(5000 * time.Millisecond)
 		description, _ = svc.DescribeTable(descInput)
-
 	}
 	fmt.Println("Created the table " + tableName + " in " + *svc.Client.Config.Region)
+
 	return result, err
 }
 
-func populateServicesTable(svc *dynamodb.DynamoDB, tableName string, services []open311.Service) {
+// Function to put items into an existing and active DynamoDB database table.  Returns the number of items added
+func populateServicesTable(svc *dynamodb.DynamoDB, tableName string, services []Service) (int, error) {
+	numItems := 0
 
 	for _, service := range services {
 		av, err := dynamodbattribute.MarshalMap(service)
@@ -132,27 +179,28 @@ func populateServicesTable(svc *dynamodb.DynamoDB, tableName string, services []
 		if err != nil {
 			fmt.Println("Got error marshalling map:")
 			fmt.Println(err.Error())
-			os.Exit(1)
+			return numItems, err
 		}
 
-		// TODO - check if item already exists?  (although, I think Dynamo might already handle this)
+		// Note: if item already exists, DynamoDB doesn't duplicate it
 
-		// Create item in table Services
+		// Prepare input for call to DynamoDB
 		input := &dynamodb.PutItemInput{
 			Item:      av,
 			TableName: aws.String(tableName),
 		}
 
+		// Add item in Services table
 		_, err = svc.PutItem(input)
-
 		if err != nil {
 			fmt.Println("Got error calling PutItem:")
 			fmt.Println(err.Error())
-			os.Exit(1)
+			return numItems, err
 		}
 
 		fmt.Println("Successfully added '" + service.ServiceName + "' (" + service.Group + ") to " + tableName + " table")
-
+		numItems++
 	}
 
+	return numItems, nil
 }
