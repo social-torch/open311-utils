@@ -5,7 +5,7 @@ If table doesn't exist, script will create table and add items
 Uses credentials found in shared credentials file ~/.aws/credentials  //TODO change this to .env in makefile
 and assumes these credentials have permission to create and put items in DynamoDB
 
-Optional flag for ./load_services_table include:
+Optional flags for ./load_services_table include:
  -region string
         AWS region in which DynamoDB table should be created (default "us-east-1")
   -serviceFile string
@@ -60,7 +60,7 @@ func main() {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
-	fmt.Println("Loaded " + strconv.Itoa(len(services)) + " Services from JSON")
+	fmt.Println("Read " + strconv.Itoa(len(services)) + " Services from JSON")
 
 	// Initialize an AWS  session in specified region that SDK will use to load
 	// credentials from the shared credentials file ~/.aws/credentials.  //TODO change this to use .env file
@@ -107,7 +107,7 @@ func readServicesJson(filename string) ([]Service, error) {
 	if err != nil {
 		fmt.Println("Error Unmarshaling JSON.  Check Syntax in " + filename)
 		fmt.Println(err.Error())
-		return nil, err
+		return services, err
 	}
 	return services, err
 }
