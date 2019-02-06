@@ -1,5 +1,17 @@
 /* Script to populate an AWS dynamoDB database from JSON file of Open311 Services
-Uses .aws credentials to specify endpoint //TODO change this to .env in makefile
+If table already exists, script will add items to existing table.
+If table doesn't exist, script will create table and add items
+
+Uses credentials found in shared credentials file ~/.aws/credentials  //TODO change this to .env in makefile
+and assumes these credentials have permission to create and put items in DynamoDB
+
+Optional flag for ./load_services_table include:
+ -region string
+        AWS region in which DynamoDB table should be created (default "us-east-1")
+  -serviceFile string
+        JSON file containing list of Open311 Services offered by city (default "./data/SchenectadyServices.json")
+  -tableName string
+        Name of table in DynamoDB that will hold Services data (default "Services")
 */
 
 package main
@@ -9,11 +21,13 @@ import (
 	"flag"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -46,9 +60,10 @@ func main() {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
+	fmt.Println("Loaded " + strconv.Itoa(len(services)) + " Services from JSON")
 
 	// Initialize an AWS  session in specified region that SDK will use to load
-	// credentials from the shared credentials file ~/.aws/credentials.
+	// credentials from the shared credentials file ~/.aws/credentials.  //TODO change this to use .env file
 	sess, err := session.NewSession(&aws.Config{Region: aws.String(*regionPtr)})
 	if err != nil {
 		fmt.Println("Error creating AWS session:")
@@ -56,8 +71,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Create DynamoDB table to hold services.  Function doesn't return until table is ready for items to be written
 	svc := dynamodb.New(sess)
+
+	// Create DynamoDB table to hold services.  Function doesn't return until table is ready for items to be written
 	_, err = createServicesTable(svc, *tableNamePtr)
 	if err != nil {
 		fmt.Println("Error creating '" + *tableNamePtr + "' table.")
@@ -73,10 +89,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println(itemsAdded)
+	fmt.Println("This script added " + strconv.Itoa(itemsAdded) + " items to the '" + *tableNamePtr + "' table.")
 
 }
 
+// Utility function to read JSON file and unmarshal into array of Services
 func readServicesJson(filename string) ([]Service, error) {
 	raw, err := ioutil.ReadFile(filename)
 
@@ -92,9 +109,10 @@ func readServicesJson(filename string) ([]Service, error) {
 		fmt.Println(err.Error())
 		return nil, err
 	}
-	return services, nil
+	return services, err
 }
 
+// Function to create AWS DynamoDB table of given name.  Function does not return until table is ACTIVE
 func createServicesTable(svc *dynamodb.DynamoDB, tableName string) (*dynamodb.CreateTableOutput, error) {
 
 	input := &dynamodb.CreateTableInput{
@@ -111,15 +129,26 @@ func createServicesTable(svc *dynamodb.DynamoDB, tableName string) (*dynamodb.Cr
 			},
 		},
 		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(5), // TODO Determine right default provisioned capacity
+			ReadCapacityUnits:  aws.Int64(5), //TODO Determine right default provisioned capacity
 			WriteCapacityUnits: aws.Int64(5),
 		},
 		TableName: aws.String(tableName),
 	}
 
 	result, err := svc.CreateTable(input)
+
+	// If table already exists, return gracefully
+	// see: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/handling-errors.html
 	if err != nil {
-		return result, err
+		if awsErr, ok := err.(awserr.Error); ok {
+			switch awsErr.Code() {
+			case dynamodb.ErrCodeResourceInUseException: // AWS returns ResouceInUseException to a createTable call if table already exists
+				fmt.Println("Warning: '" + tableName + "' table already exists.  Continuing to add items to existing table.")
+				return result, nil // If table already exists, return without error to continue
+			default: // Process error generically
+				return result, err
+			}
+		}
 	}
 
 	// Get current table description to see if table is ready to write items
@@ -140,7 +169,7 @@ func createServicesTable(svc *dynamodb.DynamoDB, tableName string) (*dynamodb.Cr
 	return result, err
 }
 
-// TODO comment function and returns.
+// Function to put items into an existing and active DynamoDB database table.  Returns the number of items added
 func populateServicesTable(svc *dynamodb.DynamoDB, tableName string, services []Service) (int, error) {
 	numItems := 0
 
@@ -174,5 +203,4 @@ func populateServicesTable(svc *dynamodb.DynamoDB, tableName string, services []
 	}
 
 	return numItems, nil
-
 }
