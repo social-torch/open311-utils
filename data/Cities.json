@@ -5,6 +5,6 @@
   },
   {
     "city_name": "Niskayuna, NY",
-    "endpoint": "http://www.google.com"
+    "endpoint": "https://cqz09i2fl6.execute-api.us-east-1.amazonaws.com/Prod"
   }
 ]
