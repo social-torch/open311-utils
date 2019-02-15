@@ -1,0 +1,10 @@
+[
+  {
+    "city_name": "Schenectady, NY",
+    "endpoint": "https://roqlqvkke4.execute-api.us-east-1.amazonaws.com/Prod"
+  },
+  {
+    "city_name": "Niskayuna, NY",
+    "endpoint": "http://www.google.com"
+  }
+]
