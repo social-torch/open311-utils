@@ -23,6 +23,7 @@ $ > go get github.com/aws/aws-sdk-go
 ```bash
 $ > go build load_services_table.go 
 $ > go build load_requests_table.go 
+$ > go build load_cities_table.go 
 ```
 
 ## Usage
@@ -30,6 +31,7 @@ $ > go build load_requests_table.go
 ```bash
 $ > ./load_services_table
 $ > ./load_requests_table
+$ > ./load_cities_table
 ```
 
 Usage of ./load_services_table:
