@@ -151,5 +151,14 @@
 		"type": "realtime",
 		"keywords": ["leak", "water", "main"],
 		"group": "Water Department"
+	},
+	{
+		"service_code": "SC-8a28ff0d-b954-4f56-aad0-83397db49a4e",
+		"service_name": "Miscellaneous",
+		"description": "Report an issue that doesn't fit in the other categories",
+		"metadata": true,
+		"type": "realtime",
+		"keywords": ["misc"],
+		"group": "Misc"
 	}
 ]
