@@ -29,7 +29,7 @@ $ > go build load-311-tables.go
 $ > ./load-311-tables --serviceFile ./data/SchenectadyServices.json --requestFile ./data/SchenectadyRequests.json --cityFile ./data/Cities.json --region "us-east-1"
 ```
 
-#####Command line flags:
+##### Command line flags:
 ```  
   --serviceFile string
     	JSON file containing list of Open311 Services offered by city (default "./data/SchenectadyServices.json")
@@ -46,7 +46,7 @@ For example, to create and load only a Services table in us-west-2 (and not crea
 $ > ./load_311_tables --serviceFile ./data/ChicagoServices.json --region "us-west-2"
 ```
 
-##Makefile (optional)
+## Makefile (optional)
 A makefile really isn't necessary here (see the [go command Motivation](view-source:https://golang.org/doc/articles/go_command.html)).
 But for you makefile fans, the following commands will accomplish everything listed aboveL
 ```bash
