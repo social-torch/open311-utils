@@ -1,62 +1,63 @@
 # Open311 Utilities
-These golang utilities will load AWS DynamoDB tables with Open311 Services and Requests
-for pre-populating city services in a new Open311 deployment or for testing with a set of requests.
+This golang utility will create and load AWS DynamoDB tables with Open311 Services, Requests, and City endpoints
+for pre-populating services in a new Open311 deployment or for testing with a set of requests.
 
-Depends on AWS credentials set up as noted here
-https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html
 
+
+## Dependencies
+```bash
+$ > go get github.com/aws/aws-sdk-go
+$ > go get flag
+```
+Also depends on AWS credentials set up as noted here:
+     https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html
+
+
+## Checkout
 ```bash
 $ > mkdir -p $GOPATH/src/github.com/social-torch
 $ > cd  $GOPATH/src/github.com/social-torch
 $ > git clone git@github.com:social-torch/open311-utils
-$ > cd open311-utils
-
 ```
-
-## Dependencies
-```bash
-$ > go get flag
-$ > go get github.com/aws/aws-sdk-go
-```
-
 ## Build
 ```bash
-$ > go build load_services_table.go 
-$ > go build load_requests_table.go 
-$ > go build load_cities_table.go 
+$ > go build load-311-tables.go 
 ```
 
 ## Usage
-
 ```bash
-$ > ./load_services_table
-$ > ./load_requests_table
-$ > ./load_cities_table
+$ > ./load-311-tables --serviceFile ./data/SchenectadyServices.json --requestFile ./data/SchenectadyRequests.json --cityFile ./data/Cities.json --region "us-east-1"
 ```
 
-Usage of ./load_services_table:
+#####Command line flags:
+```  
+  --serviceFile string
+    	JSON file containing list of Open311 Services offered by city (default "./data/SchenectadyServices.json")
+  --requestFile string
+    	JSON file containing list of example Open311 requests (default "")
+  --cityFile string
+    	JSON file containing list of cities and corresponding endpoints (default "./data/Cities.json")
+  --region string
+    	AWS region in which DynamoDB table should be created (default "us-east-1")
 ```
-  -region string
-        AWS region in which DynamoDB table should be created (default "us-east-1")
-  -serviceFile string
-        JSON file containing list of Open311 Services offered by city (default "./data/SchenectadyServices.json")
-  -tableName string
-        Name of table in DynamoDB that will hold Services data (default "Services")
+If any of serviceFile, requestFile, or cityFile is not specified, that table will not be created nor populated.
+For example, to create and load only a Services table in us-west-2 (and not create/load Requests and Cities tables):
 ```
-
-Usage of ./load_requests_table:
-```
-  -region string
-        AWS region in which DynamoDB table should be created (default "us-east-1")
-  -requestFile string
-        JSON file containing list of example requests (default "./data/SchenectadyRequests.json")
-  -tableName string
-        Name of table in DynamoDB that will hold Requests data (default "Requests")
+$ > ./load_311_tables --serviceFile ./data/ChicagoServices.json --region "us-west-2"
 ```
 
-### Specify command line options
-
+##Makefile (optional)
+A makefile really isn't necessary here (see the [go command Motivation](view-source:https://golang.org/doc/articles/go_command.html)).
+But for you makefile fans, the following commands will accomplish everything listed aboveL
 ```bash
-$ > ./load_services_table --region "us-east-1" --serviceFile "./data/ChicagoServices.json" --tableName "ChiServices"
-$ > ./load_requests_table --region "us-east-1" --requestFile "./data/ChicagoRequests.json" --tableName "ChiRequests"
+# Get Dependencies
+$ > make dep
+
+# Build binary
+$ > make build
+
+# Create and populate Services, Request, and Cities example tables in AWS
+$ > make deploy
 ```
+
+
