@@ -47,7 +47,7 @@ $ > ./load_311_tables --serviceFile ./data/ChicagoServices.json --region "us-wes
 ```
 
 ## Makefile (optional)
-A makefile really isn't necessary here (see the [go command Motivation](view-source:https://golang.org/doc/articles/go_command.html)).
+A makefile really isn't necessary here (see the [go command Motivation](https://golang.org/doc/articles/go_command.html)).
 But for you makefile fans, the following commands will accomplish everything listed aboveL
 ```bash
 # Get Dependencies
