@@ -28,15 +28,17 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strconv"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-	"io/ioutil"
-	"os"
-	"strconv"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
 )
 
 const (
@@ -256,7 +258,8 @@ func createDynamoClient(region string) (*dynamodb.DynamoDB, error) {
 // ensure that primaryKey passed in matches the intended JSON field of the struct
 // Table is created with a provisioned throughput set low to qualify for AWS free tier.
 //   Highly utilized production instances will need to increase this
-func createTable(svc *dynamodb.DynamoDB, tableName string, primaryKey string) (*dynamodb.CreateTableOutput, error) {
+//func createTable(svc *dynamodb.DynamoDB, tableName string, primaryKey string) (*dynamodb.CreateTableOutput, error) {
+func createTable(svc dynamodbiface.DynamoDBAPI, tableName string, primaryKey string) (*dynamodb.CreateTableOutput, error) {
 
 	input := &dynamodb.CreateTableInput{
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
@@ -280,7 +283,7 @@ func createTable(svc *dynamodb.DynamoDB, tableName string, primaryKey string) (*
 
 	result, err := svc.CreateTable(input)
 
-	// If table already exists, return gracefully
+	// If table already exists, continue gracefully
 	// see: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/handling-errors.html
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
@@ -291,6 +294,9 @@ func createTable(svc *dynamodb.DynamoDB, tableName string, primaryKey string) (*
 			default: // Process error generically
 				return result, err
 			}
+		} else {
+			// Catch non-awsErrs and process ... highly unlikly code will execute this path
+			return result, err
 		}
 	}
 
@@ -301,12 +307,12 @@ func createTable(svc *dynamodb.DynamoDB, tableName string, primaryKey string) (*
 		TableName: aws.String(tableName),
 	})
 	if err != nil {
-		fmt.Println("Error waiting on table creation for '" + CitiesTable + "' table.")
+		fmt.Println("Error waiting on table creation for '" + tableName + "' table.")
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	fmt.Println("Created the table '" + tableName + "' in " + *svc.Client.Config.Region)
+	fmt.Println("Created table: '" + tableName + "'")
 
 	return result, err
 }
@@ -404,7 +410,7 @@ func populateCitiesTable(svc *dynamodb.DynamoDB, tableName string, cities []City
 			TableName: aws.String(tableName),
 		}
 
-		// Add item in Services table
+		// Add item in City table
 		_, err = svc.PutItem(input)
 		if err != nil {
 			fmt.Println("Got error calling PutItem:")
