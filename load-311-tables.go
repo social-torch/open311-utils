@@ -43,6 +43,7 @@ const (
 	ServicesTable 	= "Services"
 	RequestsTable 	= "Requests"
 	CitiesTable  		= "Cities"
+	FeedbackTable		= "Feedback"
 	OnboardingTable = "OnboardingRequests"
 )
 
@@ -228,9 +229,19 @@ func main() {
 		fmt.Println("Added " + strconv.Itoa(itemsAdded) + " items to the '" + CitiesTable + "' table.\n")
 	}
 
+	// ///////////// Feedback Table  /////////////////////////////
+	// Create DynamoDB table to hold user feedback.  Function doesn't return until table is ready for items to be written
+	result, err := createTable(svc, FeedbackTable, "id")
+	if err != nil {
+		fmt.Println("Error creating '" + FeedbackTable + "' table.")
+		fmt.Printf("With AWS response: %+v", result)
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
 	// ///////////// OnboardingRequests Table  /////////////////////////////
 	// Create DynamoDB table to hold onboarding requests.  Function doesn't return until table is ready for items to be written
-	result, err := createTable(svc, OnboardingTable, "id")
+	result, err = createTable(svc, OnboardingTable, "id")
 	if err != nil {
 		fmt.Println("Error creating '" + OnboardingTable + "' table.")
 		fmt.Printf("With AWS response: %+v", result)
