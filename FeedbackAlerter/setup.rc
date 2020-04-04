@@ -1,0 +1,37 @@
+# This file:
+#
+#  - Sets up environment variables to make rest of script all nice and easy
+#  - 
+#  - Most importantly, set AWS_DEFAULT_REGION and AWS_ACCOUNT_ID to match your credentials.
+#       The rest should work as is.
+#
+# Usage:
+#
+#  source setup.rc
+#
+# Based on a Amazon Tutorial: Process New Items with DynamoDB Streams and Lambda
+# https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.Lambda.Tutorial.html
+#
+
+export AWS_DEFAULT_REGION="us-east-1"
+export AWS_ACCOUNT_ID="598894233672"
+export SUBSCRIBING_EMAIL="randy@socialtorch.org"
+
+export FEEDBACK_TABLE_NAME="Feedback"
+export FEEDBACK_PRIMARY_KEY="id"
+
+export POLICY_NAME="FeedbackLambdaRolePolicy"
+export TRUST_RELATIONSHIP_DOCUMENT="trust-relationship.json"
+export POLICY_TEMPLATE="role-policy.template"
+export POLICY_DOCUMENT="role-policy.json"
+
+export LAMBDA_ROLE_NAME="FeedbackLambdaRole"
+export LAMBDA_FUNCTION_NAME="publishFeedback"
+export TOPIC_NAME="feedbackTopic"
+
+export LAMBDA_TEMPATE="publishFeedback.template"
+export LAMBDA_JS_FILE="publishFeedback.js"
+export LAMBDA_ZIP_FILE="publishFeedback.zip"
+
+export TEST_PAYLOAD_FILE="testPayload.json"
+
