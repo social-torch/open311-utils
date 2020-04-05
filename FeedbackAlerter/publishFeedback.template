@@ -8,10 +8,14 @@ exports.handler = (event, context, callback) => {
         console.log('Stream record: ', JSON.stringify(record, null, 2));
 
         if (record.eventName == 'INSERT') {
-            var what = JSON.stringify(record.dynamodb.NewImage.id.S);
+            var who =  JSON.stringify(record.dynamodb.NewImage.account_id.S);
+            var type = JSON.stringify(record.dynamodb.NewImage.type.S);
+            var what = JSON.stringify(record.dynamodb.NewImage.description.S);
+            var request = JSON.stringify(record.dynamodb.NewImage.request_id.S);
+
             var params = {
-                Subject: 'Feedback or innappropriate image reported on Social Torch',
-                Message: 'Feedback sumbitted via Social Torch App:\n\n ' + what,
+                Subject: type + ' reported on Social Torch',
+                Message: 'Social Torch user ' + who + ' sumbitted feedback via the Social Torch App:\n\n Type: ' + type +'\n Request ID: ' + request + '\n Description: ' + what,
                 TopicArn: 'arn:aws:sns:#{AWS_DEFAULT_REGION}:#{AWS_ACCOUNT_ID}:#{TOPIC_NAME}'
             };
             sns.publish(params, function(err, data) {

@@ -10,13 +10,26 @@
                 "ApproximateCreationDateTime": 1479499740,
                 "Keys": {
                     "id": {
-                        "S": "Test Feedback"
+                        "S": "DEADBEEF"
                     }
                 },
                 "NewImage": {
                     "id": {
-                        "S": "This is a test feedback message"
+                        "S": "DEADBEEF"
+                    },
+                    "account_id": {
+                        "S": "my_account_id"
+                    },
+                    "request_id": {
+                        "S": "my_request_id"
+                    },
+                    "type": {
+                        "S": "concern"
+                    },
+                    "description": {
+                        "S": "My Description"
                     }
+
                 },
                 "SequenceNumber": "13021600000000001596893679",
                 "SizeBytes": 112,

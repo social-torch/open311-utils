@@ -19,7 +19,7 @@ This repo is based on a [tutorial from Amazon](https://docs.aws.amazon.com/amazo
 
 ## Step 0: AWS CLI Setup
 
-Make darn sure your AWS CLI is setup to configure the thing you want to configure.  
+Make darn sure your AWS CLI is setup to modify the account you want to modify.  
 
 * See documentation [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)  
 * Pro tip: try using [profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html)  
@@ -123,7 +123,12 @@ I'm done typing for you.  No shell script for this one.  Type the following to p
 ```bash
 aws dynamodb put-item \
     --table-name Feedback \
-    --item id={S="Testing...1...2...3"}
+    --item '{
+        "id":{"S":"1234567890"},
+        "account_id":{"S":"Wuhan"},
+        "request_id":{"S":"SR-123456789"},
+        "type":{"S":"concern"},
+        "description":{"S":"Fix it Felix"}}'
 ```
 
 Now... go check your email.

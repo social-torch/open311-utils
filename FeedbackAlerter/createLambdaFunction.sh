@@ -22,6 +22,7 @@ set -o nounset
 sed \
     -e "s|#{AWS_DEFAULT_REGION}|${AWS_DEFAULT_REGION}|g"     \
     -e "s|#{AWS_ACCOUNT_ID}|${AWS_ACCOUNT_ID}|g"             \
+    -e "s|#{TOPIC_NAME}|${TOPIC_NAME}|g"                     \
     ${LAMBDA_TEMPATE} > ${LAMBDA_JS_FILE}
 
 # Zip up the lambda code
