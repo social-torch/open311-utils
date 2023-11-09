@@ -14,8 +14,8 @@
 #
 
 export AWS_DEFAULT_REGION="us-east-1"
-export AWS_ACCOUNT_ID="598894233672"
-export SUBSCRIBING_EMAIL="randy@socialtorch.org"
+export AWS_ACCOUNT_ID="999999999999"
+export SUBSCRIBING_EMAIL="spam@example.com"
 
 export FEEDBACK_TABLE_NAME="Feedback"
 export FEEDBACK_PRIMARY_KEY="id"
